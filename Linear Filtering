@@ -1,0 +1,64 @@
+%% This program will use linear filtering with a Gaussian filter to 
+% denoise the image nebula.jpg.
+
+% Load the image matrix.
+load('nebula.mat');
+
+% Use the rows and columns of the image matrix to set sigma_x and sigma_y later on.
+N = 700;
+M = 468;
+midN = (N/2) + 1;
+midM = (M/2) + 1;
+
+% Convert the image matrix to double precision.
+nebulaData = double(nebula);
+
+% Perform 2-D fast Fourier transform;
+nebulaF = fft2(nebulaData);
+
+% Perform fast Fourier transform shift.
+nebulaFS = fftshift(nebulaF);
+
+% Set ix from column 1 to last column and iy from row 1 to last row.
+Ix = 1:N;
+Iy = 1:M;
+
+% Use meshgrid to create 2-D values in x and y directions.
+[Ix, Iy] = meshgrid(Ix, Iy);
+
+% Gaussian filter.
+
+FS = [0.01 0.001 0.0001 0.00001];
+
+for j=1:4
+   
+	% Perform Gaussian function with sigma_x = sigma_y.
+    F = exp(-FS(j) * (Ix - midN).^(2) - FS(j) * (Iy - midM).^(2) );
+    
+	% Multiply by Gaussian function.
+    nebulaFSB = nebulaFS .* F;
+	
+	% Perform inverse fast Fourier transform shift.
+	% This undoes the fast Fourier transform shift performed earlier.
+    nebulaFB = ifftshift(nebulaFSB);
+	
+	% Perform inverse 2-D fast Fourier transform.
+	% This undoes the 2-D fast Fourier transform performed earlier.
+    nebulaF = ifft2(nebulaFB);
+    
+	% Produce image of Fourier spectrum.
+    figure(1)
+    subplot(2,2,j);
+    pcolor(log(abs(nebulaFSB)));
+    
+    shading interp
+    colormap(gray)
+    set(gca, 'Xtick', [], 'Ytick', [])
+    
+	% Produce output image of denoised nebula.
+    figure(2)
+    subplot(2,2,j)
+    imshow(uint8(nebulaF))
+    colormap(gray)
+    
+end
