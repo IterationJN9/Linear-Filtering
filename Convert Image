@@ -1,0 +1,23 @@
+%% This program will take image files and convert them into MAT files.
+
+% Read images as an m x n x k matrix.
+nebulaInit = imread('nebula', 'jpeg');
+
+%figure(1)
+%imshow(galaxyInit)
+%title('Input Image: Galaxy')
+
+figure(1)
+imshow(nebulaInit)
+title('Input Image: Nebula')
+
+% Convert images from RGB scale to grayscale.
+% This allows us to convert them to a 2d matrix.
+nebula = rgb2gray(nebulaInit);
+
+%figure
+%imshow(picNew)
+%title('Gray converted image')
+
+% Save the image matrices as MAT files for later use.
+save('nebula.mat', 'nebula');
